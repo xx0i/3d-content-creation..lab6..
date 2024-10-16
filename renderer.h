@@ -529,7 +529,8 @@ private:
 			samplerInfo.compareOp = VK_COMPARE_OP_LESS;
 			samplerInfo.unnormalizedCoordinates = VK_FALSE;
 			samplerInfo.pNext = nullptr;
-			vkCreateSampler(device, &samplerInfo, nullptr, &textureSampler);
+			VkResult result = vkCreateSampler(device, &samplerInfo, nullptr, &textureSampler);
+
 
 			VkDescriptorBufferInfo textureDescriptorBuffer = {};
 			textureDescriptorBuffer.buffer = textureHandle[i];
