@@ -249,7 +249,7 @@ public:
 
 
 		VkDescriptorSetLayoutBinding textureBinding = {};
-		textureBinding.binding = 2;
+		textureBinding.binding = 0;
 		textureBinding.descriptorCount = 1;
 		textureBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
 		textureBinding.pImmutableSamplers = nullptr;
