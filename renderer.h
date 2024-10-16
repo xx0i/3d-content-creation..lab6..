@@ -1214,9 +1214,9 @@ private:
 
 		vkDestroyBuffer(device, textureHandle, nullptr);
 		vkFreeMemory(device, textureData, nullptr);
-		vkDestroyImageView(device, imageView, nullptr);
-		vkDestroyImage(device, image, nullptr);
 		vkDestroyDescriptorSetLayout(device, textureDescriptorSetLayout, nullptr);
 		vkDestroySampler(device, textureSampler, nullptr);
+		vkDestroyImage(device, image, nullptr);
+		vkDestroyImageView(device, imageView, nullptr);
 	}
 };
