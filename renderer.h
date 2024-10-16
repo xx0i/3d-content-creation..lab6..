@@ -424,7 +424,7 @@ private:
 
 		VkDescriptorPoolCreateInfo descriptorPoolInfo = {};
 		descriptorPoolInfo.flags = 0;
-		descriptorPoolInfo.maxSets = uniformBufferHandle.size();
+		descriptorPoolInfo.maxSets = uniformBufferHandle.size() * 3;
 		descriptorPoolInfo.pNext = nullptr;
 		descriptorPoolInfo.poolSizeCount = poolSizes.size();
 		descriptorPoolInfo.pPoolSizes = poolSizes.data();
