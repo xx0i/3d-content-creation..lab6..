@@ -206,6 +206,7 @@ public:
 			temp.width = model.images[i].width;
 			temp.width = model.images[i].component;
 			temp.pixel_type = model.images[i].pixel_type;
+			temp.bufferView = model.images[i].bufferView;
 			UploadTextureToGPU(vlk, temp, textureHandle[i], textureData[i], images[i], imagesView[i]);
 		}
 	}
