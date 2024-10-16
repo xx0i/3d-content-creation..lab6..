@@ -85,7 +85,7 @@ class Renderer
 	std::vector<VkDeviceMemory> textureData;
 	VkDescriptorSetLayout textureDescriptorSetLayout = nullptr;
 	std::vector<VkDescriptorSet> textureDescriptorSets = {};
-	std::vector<VkSampler> textureSamplers;
+	VkSampler textureSampler{};
 
 public:
 
@@ -529,7 +529,7 @@ private:
 			samplerInfo.compareOp = VK_COMPARE_OP_LESS;
 			samplerInfo.unnormalizedCoordinates = VK_FALSE;
 			samplerInfo.pNext = nullptr;
-			vkCreateSampler(device, &samplerInfo, nullptr, &textureSamplers[i]);
+			vkCreateSampler(device, &samplerInfo, nullptr, &textureSampler);
 
 			VkDescriptorBufferInfo textureDescriptorBuffer = {};
 			textureDescriptorBuffer.buffer = textureHandle[i];
@@ -539,7 +539,7 @@ private:
 			VkDescriptorImageInfo imageInfo = {};
 			imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 			imageInfo.imageView = imagesView[i];
-			imageInfo.sampler = textureSamplers[i];
+			imageInfo.sampler = textureSampler;
 
 			VkWriteDescriptorSet writeTextureDescriptor = {};
 			writeTextureDescriptor.descriptorCount = 1;
