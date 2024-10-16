@@ -208,7 +208,7 @@ public:
 			temp.pixel_type = model.images[i].pixel_type;
 			temp.bufferView = model.images[i].bufferView;
 			temp.image = model.images[i].image;
-			std::cout << "  image size: " << temp.image.size() << std::endl;
+			temp.image.resize(temp.width * temp.height * temp.component);
 			UploadTextureToGPU(vlk, temp, textureHandle[i], textureData[i], images[i], imagesView[i]);
 		}
 	}
