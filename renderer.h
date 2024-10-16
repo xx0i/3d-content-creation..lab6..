@@ -1183,6 +1183,13 @@ private:
 	{
 		// wait till everything has completed
 		vkDeviceWaitIdle(device);
+		vkDestroyBuffer(device, textureHandle, nullptr);
+		vkFreeMemory(device, textureData, nullptr);
+		vkDestroyDescriptorSetLayout(device, textureDescriptorSetLayout, nullptr);
+		vkDestroySampler(device, textureSampler, nullptr);
+		vkDestroyImage(device, image, nullptr);
+		vkDestroyImageView(device, imageView, nullptr);
+
 		// Release allocated buffers, shaders & pipeline
 		vkDestroyBuffer(device, geometryHandle, nullptr);
 		vkFreeMemory(device, geometryData, nullptr);
@@ -1211,12 +1218,5 @@ private:
 		storageBufferHandle.clear();
 		storageBufferData.clear();
 
-
-		vkDestroyBuffer(device, textureHandle, nullptr);
-		vkFreeMemory(device, textureData, nullptr);
-		vkDestroyDescriptorSetLayout(device, textureDescriptorSetLayout, nullptr);
-		vkDestroySampler(device, textureSampler, nullptr);
-		vkDestroyImage(device, image, nullptr);
-		vkDestroyImageView(device, imageView, nullptr);
 	}
 };
