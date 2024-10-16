@@ -18,7 +18,7 @@ cbuffer other_data
 float4 main(OUTPUT2 input) : SV_TARGET
 {
     //temp hard coded data - till the texture data is used in lab 6
-    static float4 diffuse = { 0.75f, 0.75f, 0.25f, 0.0f };
+    static float4 diffuse = { 1.0f, 1.0f, 1.0f, 0.0f };
     static float4 specular = { 1.0f, 1.0f, 1.0f, 1.0f };
     static float4 emissive = { 0.0f, 0.0f, 0.0f, 1.0f };
     static float4 ambient = { 0.1f, 0.1f, 0.1f, 1.0f };

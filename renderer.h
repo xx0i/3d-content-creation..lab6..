@@ -2,6 +2,7 @@
 #define	STB_IMAGE_IMPLEMENTATION
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "../TinyGLTF/tiny_gltf.h"
+#include "../Materials/TextureUtils.h"
 
 #include "shaderc/shaderc.h" // needed for compiling shaders at runtime
 #ifdef _WIN32 // must use MT platform DLL libraries on windows
@@ -78,6 +79,8 @@ class Renderer
 	GW::MATH::GVECTORF lightColour = { 0.9f, 0.9f, 1.0f, 1.0f };
 	GW::MATH::GVECTORF lightDir = { 1.0f, -1.0f, -2.0f };
 
+	std::vector<tinygltf::Image> images;
+
 public:
 
 	Renderer(GW::SYSTEM::GWindow _win, GW::GRAPHICS::GVulkanSurface _vlk)
@@ -101,10 +104,10 @@ public:
 		//controllers for camera
 		input.Create(win);
 		controller.Create();
-
 		//loadingRudimentaryfromGltf("C:/full sail/3d content creation/3dcc-lab-5-xx0i/Models/triangle.gltf");
 		//loadingRudimentaryfromGltf("C:/full sail/3d content creation/3dcc-lab-5-xx0i/Models/triangle_blender.gltf");
 		loadingRudimentaryfromGltf("C:/full sail/3d content creation/3dcc-lab-5-xx0i/Models/cat_blender.gltf");
+		loadImageFromGltf();
 		createDescriptorLayout();
 		InitializeGraphics();
 		BindShutdownCallback();
@@ -180,6 +183,12 @@ public:
 			}
 
 		}
+	}
+
+	void loadImageFromGltf()
+	{
+		unsigned int size = model.images.size();
+		images.resize(size);
 	}
 
 	void createDescriptorLayout() //part b1
