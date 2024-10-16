@@ -185,6 +185,9 @@ public:
 				printf("  Target: %d\n", bufferView.target);
 			}
 
+			for (int i = 0; i < model.images.size(); ++i) {
+				std::cout << "Image " << i << " mimeType: " << model.images[i].mimeType << std::endl;
+			}
 		}
 	}
 
