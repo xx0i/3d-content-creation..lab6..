@@ -194,22 +194,19 @@ public:
 	{
 		unsigned int size = model.images.size();
 
-		for (int i = 0; i < size; i++)
-		{
 			tinygltf::Image temp;
-			temp.mimeType = getMimeTypeFromUri(model.images[i].uri);
-			temp.name = model.images[i].name;
-			temp.uri = model.images[i].uri;
-			temp.bits = model.images[i].bits;
-			temp.height = model.images[i].height;
-			temp.width = model.images[i].width;
-			temp.component = model.images[i].component;
-			temp.pixel_type = model.images[i].pixel_type;
-			temp.bufferView = model.images[i].bufferView;
-			temp.image = model.images[i].image;
+			temp.mimeType = getMimeTypeFromUri(model.images[0].uri);
+			temp.name = model.images[0].name;
+			temp.uri = model.images[0].uri;
+			temp.bits = model.images[0].bits;
+			temp.height = model.images[0].height;
+			temp.width = model.images[0].width;
+			temp.component = model.images[0].component;
+			temp.pixel_type = model.images[0].pixel_type;
+			temp.bufferView = model.images[0].bufferView;
+			temp.image = model.images[0].image;
 			temp.image.resize(temp.width * temp.height * temp.component);
 			UploadTextureToGPU(vlk, temp, textureHandle, textureData, image, imageView);
-		}
 	}
 
 	std::string getMimeTypeFromUri(const std::string& uri)
@@ -1212,10 +1209,10 @@ private:
 		storageBufferData.clear();
 
 
-		//vkDestroyBuffer(device, textureHandle, nullptr);
-		//vkFreeMemory(device, textureData, nullptr);
-		//vkDestroyImage(device, image, nullptr); 
-		//vkDestroyImageView(device, imageView, nullptr);
+		vkDestroyBuffer(device, textureHandle, nullptr);
+		vkFreeMemory(device, textureData, nullptr);
+		vkDestroyImage(device, image, nullptr); 
+		vkDestroyImageView(device, imageView, nullptr);
 		vkDestroyDescriptorSetLayout(device, textureDescriptorSetLayout, nullptr);
 		vkDestroySampler(device, textureSampler, nullptr);
 	}
