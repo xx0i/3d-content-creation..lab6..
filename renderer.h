@@ -1236,5 +1236,6 @@ private:
 		imagesView.clear();
 
 		vkDestroyDescriptorSetLayout(device, textureDescriptorSetLayout, nullptr);
+		vkDestroySampler(device, textureSampler, nullptr);
 	}
 };
