@@ -86,6 +86,7 @@ class Renderer
 	VkDescriptorSetLayout textureDescriptorSetLayout = nullptr;
 	std::vector<VkDescriptorSet> textureDescriptorSets = {};
 	VkSampler textureSampler{};
+	std::vector<VkDescriptorSetLayout> descriptorSetLayouts;
 
 public:
 
@@ -106,6 +107,8 @@ public:
 		shaderVarsUniformBuffer.perspectiveMatrix = perspectiveMatrix;
 		shaderVarsUniformBuffer.lightColour = lightColour;
 		shaderVarsUniformBuffer.lightDir = lightDir;
+
+		descriptorSetLayouts = { descriptorSetLayout, textureDescriptorSetLayout };
 
 		//controllers for camera
 		input.Create(win);
@@ -949,8 +952,8 @@ private:
 		// Descriptor pipeline layout
 		VkPipelineLayoutCreateInfo pipeline_layout_create_info = {};
 		pipeline_layout_create_info.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-		pipeline_layout_create_info.setLayoutCount = 1;
-		pipeline_layout_create_info.pSetLayouts = &descriptorSetLayout;
+		pipeline_layout_create_info.setLayoutCount = descriptorSetLayouts.size();
+		pipeline_layout_create_info.pSetLayouts = descriptorSetLayouts.data();
 		pipeline_layout_create_info.pushConstantRangeCount = 0;
 		pipeline_layout_create_info.pPushConstantRanges = nullptr;
 
@@ -979,7 +982,7 @@ public:
 
 		//vkCmdDraw(commandBuffer, 3, 1, 0, 0);
 		vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &descriptorSets[activeImage], 0, 0);
-
+		vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &textureDescriptorSets[activeImage], 0, 0);
 
 		const tinygltf::Accessor& indexAccessor = model.accessors[model.meshes[0].primitives[0].indices]; //part b2
 		uint32_t indexCount = indexAccessor.count;
