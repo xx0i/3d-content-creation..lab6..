@@ -15,8 +15,8 @@ cbuffer other_data
     vector lightDir, camPos;
 };
 
-Texture2D texture0 : register(t0, space2);
-SamplerState sampler0 : register(s0, space2);
+Texture2D texture0 : register(t0, space1);
+SamplerState sampler0 : register(s0, space1);
 
 float4 main(OUTPUT2 input) : SV_TARGET
 {
