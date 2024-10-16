@@ -257,7 +257,7 @@ public:
 		VkDescriptorSetLayoutBinding textureBinding = {};
 		uniformBinding.binding = 0;
 		uniformBinding.descriptorCount = 1;
-		uniformBinding.descriptorType = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE;
+		uniformBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
 		uniformBinding.pImmutableSamplers = nullptr;
 		uniformBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
 
@@ -417,8 +417,8 @@ private:
 
 		VkDescriptorPoolSize texturePoolSize = {};
 		storagePoolSize.descriptorCount = textureHandle.size();
-		storagePoolSize.type = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE;
-
+		storagePoolSize.type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+	
 		std::array<VkDescriptorPoolSize, 3> poolSizes = { uniformPoolSize, storagePoolSize, texturePoolSize };
 
 		VkDescriptorPoolCreateInfo descriptorPoolInfo = {};
