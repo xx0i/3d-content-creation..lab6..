@@ -417,7 +417,7 @@ private:
 
 		VkDescriptorPoolCreateInfo descriptorPoolInfo = {};
 		descriptorPoolInfo.flags = 0;
-		descriptorPoolInfo.maxSets = uniformBufferHandle.size() * 3;
+		descriptorPoolInfo.maxSets = uniformBufferHandle.size() + 1;
 		descriptorPoolInfo.pNext = nullptr;
 		descriptorPoolInfo.poolSizeCount = poolSizes.size();
 		descriptorPoolInfo.pPoolSizes = poolSizes.data();
@@ -931,11 +931,11 @@ private:
 
 	void CreatePipelineLayout()
 	{
-		// Descriptor pipeline layout
 		VkPipelineLayoutCreateInfo pipeline_layout_create_info = {};
 		pipeline_layout_create_info.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-		pipeline_layout_create_info.setLayoutCount = 1;
-		pipeline_layout_create_info.pSetLayouts = &descriptorSetLayout;
+		pipeline_layout_create_info.setLayoutCount = 2;
+		VkDescriptorSetLayout layouts[2] = {descriptorSetLayout, textureDescriptorSetLayout};
+		pipeline_layout_create_info.pSetLayouts = layouts;
 		pipeline_layout_create_info.pushConstantRangeCount = 0;
 		pipeline_layout_create_info.pPushConstantRanges = nullptr;
 
@@ -964,7 +964,7 @@ public:
 
 		//vkCmdDraw(commandBuffer, 3, 1, 0, 0);
 		vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &descriptorSets[activeImage], 0, 0);
-
+		vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 1, 1, &textureDescriptorSets, 0, 0);
 
 		const tinygltf::Accessor& indexAccessor = model.accessors[model.meshes[0].primitives[0].indices]; //part b2
 		uint32_t indexCount = indexAccessor.count;
