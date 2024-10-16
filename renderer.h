@@ -107,9 +107,6 @@ public:
 		shaderVarsUniformBuffer.perspectiveMatrix = perspectiveMatrix;
 		shaderVarsUniformBuffer.lightColour = lightColour;
 		shaderVarsUniformBuffer.lightDir = lightDir;
-
-		descriptorSetLayouts = { descriptorSetLayout, textureDescriptorSetLayout };
-
 		//controllers for camera
 		input.Create(win);
 		controller.Create();
@@ -953,6 +950,7 @@ private:
 		VkPipelineLayoutCreateInfo pipeline_layout_create_info = {};
 		pipeline_layout_create_info.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
 		pipeline_layout_create_info.setLayoutCount = descriptorSetLayouts.size();
+		descriptorSetLayouts = { descriptorSetLayout, textureDescriptorSetLayout };
 		pipeline_layout_create_info.pSetLayouts = descriptorSetLayouts.data();
 		pipeline_layout_create_info.pushConstantRangeCount = 0;
 		pipeline_layout_create_info.pPushConstantRanges = nullptr;
