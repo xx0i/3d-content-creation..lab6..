@@ -76,7 +76,7 @@ class Renderer
 
 	//lighting information
 	GW::MATH::GVECTORF lightColour = { 0.9f, 0.9f, 1.0f, 1.0f };
-	GW::MATH::GVECTORF lightDir = { -1.0f, -1.0f, 2.0f };
+	GW::MATH::GVECTORF lightDir = { 1.0f, -1.0f, -2.0f };
 
 public:
 
@@ -115,7 +115,7 @@ public:
 		uint32_t currentImage;
 		vlk.GetSwapchainCurrentImage(currentImage);
 
-		GW::MATH::GVECTORF cameraPosition = { -0.55f, 0.25f, -0.25f };
+		GW::MATH::GVECTORF cameraPosition = { -0.5f, 0.25f, 0.5f };
 		GW::MATH::GVECTORF targetPosition = { 0.0f, 0.02f, 0.0f };
 		GW::MATH::GVECTORF upVector = { 0.0f, 1.0f, 0.0f };
 		interfaceProxy.LookAtLHF(cameraPosition, targetPosition, upVector, viewMatrix);
