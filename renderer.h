@@ -79,14 +79,13 @@ class Renderer
 	GW::MATH::GVECTORF lightColour = { 0.9f, 0.9f, 1.0f, 1.0f };
 	GW::MATH::GVECTORF lightDir = { 1.0f, -1.0f, -2.0f };
 
-	std::vector<VkImage> images;
-	std::vector<VkImageView> imagesView;
-	std::vector<VkBuffer> textureHandle;
-	std::vector<VkDeviceMemory> textureData;
+	VkImage image;
+	VkImageView imageView;
+	VkBuffer textureHandle;
+	VkDeviceMemory textureData;
 	VkDescriptorSetLayout textureDescriptorSetLayout = nullptr;
-	std::vector<VkDescriptorSet> textureDescriptorSets = {};
+	VkDescriptorSet textureDescriptorSets;
 	VkSampler textureSampler{};
-	std::vector<VkDescriptorSetLayout> descriptorSetLayouts;
 
 public:
 
@@ -107,6 +106,7 @@ public:
 		shaderVarsUniformBuffer.perspectiveMatrix = perspectiveMatrix;
 		shaderVarsUniformBuffer.lightColour = lightColour;
 		shaderVarsUniformBuffer.lightDir = lightDir;
+
 		//controllers for camera
 		input.Create(win);
 		controller.Create();
@@ -193,10 +193,6 @@ public:
 	void loadImageFromGltf()
 	{
 		unsigned int size = model.images.size();
-		images.resize(size);
-		imagesView.resize(size);
-		textureHandle.resize(size);
-		textureData.resize(size);
 
 		for (int i = 0; i < size; i++)
 		{
@@ -212,11 +208,11 @@ public:
 			temp.bufferView = model.images[i].bufferView;
 			temp.image = model.images[i].image;
 			temp.image.resize(temp.width * temp.height * temp.component);
-			UploadTextureToGPU(vlk, temp, textureHandle[i], textureData[i], images[i], imagesView[i]);
+			UploadTextureToGPU(vlk, temp, textureHandle, textureData, image, imageView);
 		}
 	}
 
-	std::string getMimeTypeFromUri(const std::string& uri) 
+	std::string getMimeTypeFromUri(const std::string& uri)
 	{
 		if (uri.find(".jpg") != std::string::npos || uri.find(".jpeg") != std::string::npos) {
 			return "image/jpeg";
@@ -268,7 +264,7 @@ public:
 		textureLayoutInfo.pBindings = &textureBinding;
 		textureLayoutInfo.pNext = nullptr;
 		textureLayoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-	
+
 		vkCreateDescriptorSetLayout(device, &textureLayoutInfo, nullptr, &textureDescriptorSetLayout);
 	}
 
@@ -306,8 +302,8 @@ private:
 		const tinygltf::Primitive& primitive = model.meshes[0].primitives[0]; //position data
 		const tinygltf::Accessor& accessPos = model.accessors[primitive.attributes.at("POSITION")];
 		const tinygltf::BufferView& bufferViewPos = model.bufferViews[accessPos.bufferView];
-		const float* posData = reinterpret_cast<const float*> 
-			(& model.buffers[bufferViewPos.buffer].data[bufferViewPos.byteOffset + accessPos.byteOffset]);
+		const float* posData = reinterpret_cast<const float*>
+			(&model.buffers[bufferViewPos.buffer].data[bufferViewPos.byteOffset + accessPos.byteOffset]);
 
 		//normal data
 		const tinygltf::Accessor& accessNorm = model.accessors[primitive.attributes.at("NORMAL")];
@@ -332,7 +328,7 @@ private:
 		const tinygltf::BufferView& bufferViewIndices = model.bufferViews[accessIndices.bufferView];
 		const unsigned short* indexData = reinterpret_cast<const unsigned short*>
 			(&model.buffers[bufferViewIndices.buffer].data[bufferViewIndices.byteOffset]);
-			
+
 		unsigned int indexDataSize = bufferViewIndices.byteLength;
 		unsigned int posDataSize = bufferViewPos.byteLength;
 		unsigned int normDataSize = bufferViewNorm.byteLength;
@@ -340,7 +336,7 @@ private:
 		unsigned int tanDataSize = bufferViewTan.byteLength;
 
 		unsigned int totalSize = posDataSize + normDataSize + texDataSize + tanDataSize + indexDataSize;
-	
+
 		if (!totalSize % 4 == 0) //adds the padding if needed
 		{
 			totalSize += totalSize % 4;
@@ -417,9 +413,9 @@ private:
 		storagePoolSize.type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
 
 		VkDescriptorPoolSize texturePoolSize = {};
-		texturePoolSize.descriptorCount = textureHandle.size();
+		texturePoolSize.descriptorCount = 1;
 		texturePoolSize.type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-	
+
 		std::vector<VkDescriptorPoolSize> poolSizes = { uniformPoolSize, storagePoolSize, texturePoolSize };
 
 		VkDescriptorPoolCreateInfo descriptorPoolInfo = {};
@@ -456,12 +452,7 @@ private:
 		descriptorAllocateInfoTexture.pSetLayouts = &textureDescriptorSetLayout;
 		descriptorAllocateInfoTexture.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
 
-		textureDescriptorSets.resize(textureHandle.size());
-
-		for (int i = 0; i < textureData.size(); i++)
-		{
-			VkResult result = vkAllocateDescriptorSets(device, &descriptorAllocateInfoTexture, &textureDescriptorSets[i]);
-		}
+		VkResult result = vkAllocateDescriptorSets(device, &descriptorAllocateInfoTexture, &textureDescriptorSets);
 	}
 
 	void linkDescriptorSetUniformBuffer()
@@ -529,32 +520,29 @@ private:
 		samplerInfo.pNext = nullptr;
 		VkResult result = vkCreateSampler(device, &samplerInfo, nullptr, &textureSampler);
 
-		for (int i = 0; i < textureData.size(); i++)
-		{
-			VkDescriptorBufferInfo textureDescriptorBuffer = {};
-			textureDescriptorBuffer.buffer = textureHandle[i];
-			textureDescriptorBuffer.offset = 0;
-			textureDescriptorBuffer.range = images.size();
+		VkDescriptorBufferInfo textureDescriptorBuffer = {};
+		textureDescriptorBuffer.buffer = textureHandle;
+		textureDescriptorBuffer.offset = 0;
+		textureDescriptorBuffer.range = sizeof(image);
 
-			VkDescriptorImageInfo imageInfo = {};
-			imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-			imageInfo.imageView = imagesView[i];
-			imageInfo.sampler = textureSampler;
+		VkDescriptorImageInfo imageInfo = {};
+		imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+		imageInfo.imageView = imageView;
+		imageInfo.sampler = textureSampler;
 
-			VkWriteDescriptorSet writeTextureDescriptor = {};
-			writeTextureDescriptor.descriptorCount = 1;
-			writeTextureDescriptor.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-			writeTextureDescriptor.dstArrayElement = 0;
-			writeTextureDescriptor.dstBinding = 0;
-			writeTextureDescriptor.dstSet = textureDescriptorSets[i];
-			writeTextureDescriptor.pBufferInfo = &textureDescriptorBuffer;
-			writeTextureDescriptor.pImageInfo = nullptr;
-			writeTextureDescriptor.pNext = nullptr;
-			writeTextureDescriptor.pTexelBufferView = nullptr;
-			writeTextureDescriptor.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-			writeTextureDescriptor.pImageInfo = &imageInfo;
-			vkUpdateDescriptorSets(device, 1, &writeTextureDescriptor, 0, nullptr);
-		}
+		VkWriteDescriptorSet writeTextureDescriptor = {};
+		writeTextureDescriptor.descriptorCount = 1;
+		writeTextureDescriptor.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+		writeTextureDescriptor.dstArrayElement = 0;
+		writeTextureDescriptor.dstBinding = 0;
+		writeTextureDescriptor.dstSet = textureDescriptorSets;
+		writeTextureDescriptor.pBufferInfo = &textureDescriptorBuffer;
+		writeTextureDescriptor.pImageInfo = nullptr;
+		writeTextureDescriptor.pNext = nullptr;
+		writeTextureDescriptor.pTexelBufferView = nullptr;
+		writeTextureDescriptor.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+		writeTextureDescriptor.pImageInfo = &imageInfo;
+		vkUpdateDescriptorSets(device, 1, &writeTextureDescriptor, 0, nullptr);
 	}
 
 	void CompileShaders()
@@ -949,10 +937,8 @@ private:
 		// Descriptor pipeline layout
 		VkPipelineLayoutCreateInfo pipeline_layout_create_info = {};
 		pipeline_layout_create_info.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-		descriptorSetLayouts.push_back(descriptorSetLayout);
-		descriptorSetLayouts.push_back(textureDescriptorSetLayout);
-		pipeline_layout_create_info.setLayoutCount = descriptorSetLayouts.size();
-		pipeline_layout_create_info.pSetLayouts = descriptorSetLayouts.data();
+		pipeline_layout_create_info.setLayoutCount = 1;
+		pipeline_layout_create_info.pSetLayouts = &descriptorSetLayout;
 		pipeline_layout_create_info.pushConstantRangeCount = 0;
 		pipeline_layout_create_info.pPushConstantRanges = nullptr;
 
@@ -981,13 +967,13 @@ public:
 
 		//vkCmdDraw(commandBuffer, 3, 1, 0, 0);
 		vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &descriptorSets[activeImage], 0, 0);
-		vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &textureDescriptorSets[activeImage], 0, 0);
+
 
 		const tinygltf::Accessor& indexAccessor = model.accessors[model.meshes[0].primitives[0].indices]; //part b2
 		uint32_t indexCount = indexAccessor.count;
 		vkCmdDrawIndexed(commandBuffer, indexCount, 1, 0, 0, 0);
 	}
-	
+
 	void updateCamera()
 	{
 		float elapsedTime = std::chrono::duration<float>(std::chrono::high_resolution_clock::now() - startTime).count();
@@ -1130,7 +1116,7 @@ private:
 		//normal
 		VkDeviceSize offsets1[] = { posDataSize };
 		vkCmdBindVertexBuffers(commandBuffer, 1, 1, &geometryHandle, offsets1);
-		
+
 		//texturecoord
 		VkDeviceSize offsets2[] = { posDataSize + normDataSize };
 		vkCmdBindVertexBuffers(commandBuffer, 2, 1, &geometryHandle, offsets2);
@@ -1145,7 +1131,7 @@ private:
 		const tinygltf::Primitive& primitive = model.meshes[0].primitives[0];
 		const tinygltf::Accessor& accessIndicies = model.accessors[primitive.indices];
 		const tinygltf::BufferView& bufferViewIndicies = model.bufferViews[accessIndicies.bufferView];
-	
+
 		const tinygltf::Accessor& accessPos = model.accessors[primitive.attributes.at("POSITION")];
 		const tinygltf::BufferView& bufferViewPos = model.bufferViews[accessPos.bufferView];
 		const float* posData = reinterpret_cast<const float*>
@@ -1225,18 +1211,11 @@ private:
 		storageBufferHandle.clear();
 		storageBufferData.clear();
 
-		for (int i = 0; i < textureHandle.size(); i++)
-		{
-			vkDestroyBuffer(device, textureHandle[i], nullptr);
-			vkFreeMemory(device, textureData[i], nullptr);
-			vkDestroyImage(device, images[i], nullptr);
-			vkDestroyImageView(device, imagesView[i], nullptr);
-		}
-		textureHandle.clear();
-		textureData.clear();
-		images.clear();
-		imagesView.clear();
 
+		vkDestroyBuffer(device, textureHandle, nullptr);
+		vkFreeMemory(device, textureData, nullptr);
+		vkDestroyImage(device, image, nullptr);
+		vkDestroyImageView(device, imageView, nullptr);
 		vkDestroyDescriptorSetLayout(device, textureDescriptorSetLayout, nullptr);
 		vkDestroySampler(device, textureSampler, nullptr);
 	}
