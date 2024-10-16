@@ -85,6 +85,7 @@ class Renderer
 	std::vector<VkDeviceMemory> textureData;
 	VkDescriptorSetLayout textureDescriptorSetLayout = nullptr;
 	std::vector<VkDescriptorSet> textureDescriptorSets = {};
+	std::vector<VkSampler> textureSamplers;
 
 public:
 
@@ -267,7 +268,7 @@ public:
 		textureLayoutInfo.pBindings = &textureBinding;
 		textureLayoutInfo.pNext = nullptr;
 		textureLayoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-
+	
 		vkCreateDescriptorSetLayout(device, &textureLayoutInfo, nullptr, &textureDescriptorSetLayout);
 	}
 
@@ -509,10 +510,36 @@ private:
 
 		for (int i = 0; i < textureData.size(); i++)
 		{
+			VkSamplerCreateInfo samplerInfo = {};
+			samplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
+			samplerInfo.flags = 0;
+			samplerInfo.addressModeU = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_BORDER;
+			samplerInfo.addressModeV = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_BORDER;
+			samplerInfo.addressModeW = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_BORDER;
+			samplerInfo.magFilter = VK_FILTER_LINEAR;
+			samplerInfo.minFilter = VK_FILTER_LINEAR;
+			samplerInfo.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
+			samplerInfo.mipLodBias = 0;
+			samplerInfo.minLod = 0;
+			samplerInfo.maxLod = FLT_MAX;
+			samplerInfo.anisotropyEnable = VK_FALSE;
+			samplerInfo.maxAnisotropy = 1.0;
+			samplerInfo.borderColor = VK_BORDER_COLOR_FLOAT_OPAQUE_WHITE;
+			samplerInfo.compareEnable = VK_FALSE;
+			samplerInfo.compareOp = VK_COMPARE_OP_LESS;
+			samplerInfo.unnormalizedCoordinates = VK_FALSE;
+			samplerInfo.pNext = nullptr;
+			vkCreateSampler(device, &samplerInfo, nullptr, &textureSamplers[i]);
+
 			VkDescriptorBufferInfo textureDescriptorBuffer = {};
 			textureDescriptorBuffer.buffer = textureHandle[i];
 			textureDescriptorBuffer.offset = 0;
 			textureDescriptorBuffer.range = images.size();
+
+			VkDescriptorImageInfo imageInfo = {};
+			imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+			imageInfo.imageView = imagesView[i];
+			imageInfo.sampler = textureSamplers[i];
 
 			VkWriteDescriptorSet writeTextureDescriptor = {};
 			writeTextureDescriptor.descriptorCount = 1;
@@ -525,7 +552,7 @@ private:
 			writeTextureDescriptor.pNext = nullptr;
 			writeTextureDescriptor.pTexelBufferView = nullptr;
 			writeTextureDescriptor.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-
+			writeTextureDescriptor.pImageInfo = &imageInfo;
 			vkUpdateDescriptorSets(device, 1, &writeTextureDescriptor, 0, nullptr);
 		}
 	}
