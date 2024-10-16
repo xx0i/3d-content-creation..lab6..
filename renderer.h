@@ -83,6 +83,8 @@ class Renderer
 	std::vector<VkImageView> imagesView;
 	std::vector<VkBuffer> textureHandle;
 	std::vector<VkDeviceMemory> textureData;
+	VkDescriptorSetLayout textureDescriptorSetLayout = nullptr;
+	std::vector<VkDescriptorSet> textureDescriptorSets = {};
 
 public:
 
@@ -250,6 +252,25 @@ public:
 		layoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
 
 		vkCreateDescriptorSetLayout(device, &layoutInfo, nullptr, &descriptorSetLayout);
+
+
+		VkDescriptorSetLayoutBinding textureBinding = {};
+		uniformBinding.binding = 0;
+		uniformBinding.descriptorCount = 1;
+		uniformBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+		uniformBinding.pImmutableSamplers = nullptr;
+		uniformBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+
+		VkDescriptorSetLayoutCreateInfo textureLayoutInfo = {};
+		layoutInfo.bindingCount = 1;
+		layoutInfo.flags = 0;
+		layoutInfo.pBindings = &textureBinding;
+		layoutInfo.pNext = nullptr;
+		layoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+
+		vkCreateDescriptorSetLayout(device, &textureLayoutInfo, nullptr, &textureDescriptorSetLayout);
+
+
 	}
 
 private:
