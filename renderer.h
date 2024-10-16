@@ -79,7 +79,10 @@ class Renderer
 	GW::MATH::GVECTORF lightColour = { 0.9f, 0.9f, 1.0f, 1.0f };
 	GW::MATH::GVECTORF lightDir = { 1.0f, -1.0f, -2.0f };
 
-	std::vector<tinygltf::Image> images;
+	std::vector<VkImage> images;
+	std::vector<VkImageView> imagesView;
+	std::vector<VkBuffer> textureHandle;
+	std::vector<VkDeviceMemory> textureData;
 
 public:
 
@@ -189,6 +192,18 @@ public:
 	{
 		unsigned int size = model.images.size();
 		images.resize(size);
+		imagesView.resize(size);
+		textureHandle.resize(size);
+		textureData.resize(size);
+
+		for (int i = 0; i < size; i++)
+		{
+			tinygltf::Image temp;
+			temp.mimeType = model.images[i].mimeType;
+			temp.name = model.images[i].name;
+			temp.uri = model.images[i].uri;
+			UploadTextureToGPU(vlk, temp, textureHandle[i], textureData[i], images[i], imagesView[i]);
+		}
 	}
 
 	void createDescriptorLayout() //part b1
@@ -1103,5 +1118,17 @@ private:
 		}
 		storageBufferHandle.clear();
 		storageBufferData.clear();
+
+		for (int i = 0; i < textureHandle.size(); i++)
+		{
+			vkDestroyBuffer(device, textureHandle[i], nullptr);
+			vkFreeMemory(device, textureData[i], nullptr);
+			vkDestroyImage(device, images[i], nullptr);
+			vkDestroyImageView(device, imagesView[i], nullptr);
+		}
+		textureHandle.clear();
+		textureData.clear();
+		images.clear();
+		imagesView.clear();
 	}
 };
