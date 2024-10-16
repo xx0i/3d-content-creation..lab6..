@@ -204,7 +204,7 @@ public:
 			temp.bits = model.images[i].bits;
 			temp.height = model.images[i].height;
 			temp.width = model.images[i].width;
-			temp.width = model.images[i].component;
+			temp.component = model.images[i].component;
 			temp.pixel_type = model.images[i].pixel_type;
 			temp.bufferView = model.images[i].bufferView;
 			temp.image = model.images[i].image;
