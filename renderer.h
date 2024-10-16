@@ -447,6 +447,20 @@ private:
 		{
 			vkAllocateDescriptorSets(device, &descriptorAllocateInfo, &descriptorSets[i]);
 		}
+
+		VkDescriptorSetAllocateInfo descriptorAllocateInfoTexture = {};
+		descriptorAllocateInfoTexture.descriptorPool = descriptorPool;
+		descriptorAllocateInfoTexture.descriptorSetCount = 1;
+		descriptorAllocateInfoTexture.pNext = nullptr;
+		descriptorAllocateInfoTexture.pSetLayouts = &textureDescriptorSetLayout;
+		descriptorAllocateInfoTexture.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+
+		textureDescriptorSets.resize(textureHandle.size());
+
+		for (int i = 0; i < textureData.size(); i++)
+		{
+			vkAllocateDescriptorSets(device, &descriptorAllocateInfoTexture, &textureDescriptorSets[i]);
+		}
 	}
 
 	void linkDescriptorSetUniformBuffer()
@@ -491,6 +505,28 @@ private:
 			std::array<VkWriteDescriptorSet, 2> writeDescriptors = { writeUniformDescriptor, writeStorageDescriptor };
 
 			vkUpdateDescriptorSets(device, 2, writeDescriptors.data(), 0, nullptr);
+		}
+
+		for (int i = 0; i < textureData.size(); i++)
+		{
+			VkDescriptorBufferInfo textureDescriptorBuffer = {};
+			textureDescriptorBuffer.buffer = textureHandle[i];
+			textureDescriptorBuffer.offset = 0;
+			textureDescriptorBuffer.range = images.size();
+
+			VkWriteDescriptorSet writeTextureDescriptor = {};
+			writeTextureDescriptor.descriptorCount = 1;
+			writeTextureDescriptor.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+			writeTextureDescriptor.dstArrayElement = 0;
+			writeTextureDescriptor.dstBinding = 0;
+			writeTextureDescriptor.dstSet = textureDescriptorSets[i];
+			writeTextureDescriptor.pBufferInfo = &textureDescriptorBuffer;
+			writeTextureDescriptor.pImageInfo = nullptr;
+			writeTextureDescriptor.pNext = nullptr;
+			writeTextureDescriptor.pTexelBufferView = nullptr;
+			writeTextureDescriptor.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+
+			vkUpdateDescriptorSets(device, 1, &writeTextureDescriptor, 0, nullptr);
 		}
 	}
 
