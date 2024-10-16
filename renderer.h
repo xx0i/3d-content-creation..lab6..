@@ -416,7 +416,7 @@ private:
 		storagePoolSize.type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
 
 		VkDescriptorPoolSize texturePoolSize = {};
-		storagePoolSize.descriptorCount = images.size();
+		storagePoolSize.descriptorCount = textureHandle.size();
 		storagePoolSize.type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
 
 		std::array<VkDescriptorPoolSize, 3> poolSizes = { uniformPoolSize, storagePoolSize, texturePoolSize };
