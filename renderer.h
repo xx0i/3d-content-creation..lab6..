@@ -202,6 +202,7 @@ public:
 			temp.mimeType = model.images[i].mimeType;
 			temp.name = model.images[i].name;
 			temp.uri = model.images[i].uri;
+			temp.bits = 32;
 			UploadTextureToGPU(vlk, temp, textureHandle[i], textureData[i], images[i], imagesView[i]);
 		}
 	}
