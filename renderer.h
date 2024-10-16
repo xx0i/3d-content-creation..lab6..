@@ -415,13 +415,17 @@ private:
 		storagePoolSize.descriptorCount = storageBufferHandle.size();
 		storagePoolSize.type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
 
-		std::array<VkDescriptorPoolSize, 2> poolSizes = { uniformPoolSize, storagePoolSize };
+		VkDescriptorPoolSize texturePoolSize = {};
+		storagePoolSize.descriptorCount = textureHandle.size();
+		storagePoolSize.type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+
+		std::array<VkDescriptorPoolSize, 3> poolSizes = { uniformPoolSize, storagePoolSize, texturePoolSize };
 
 		VkDescriptorPoolCreateInfo descriptorPoolInfo = {};
 		descriptorPoolInfo.flags = 0;
 		descriptorPoolInfo.maxSets = uniformBufferHandle.size();
 		descriptorPoolInfo.pNext = nullptr;
-		descriptorPoolInfo.poolSizeCount = 2;
+		descriptorPoolInfo.poolSizeCount = 3;
 		descriptorPoolInfo.pPoolSizes = poolSizes.data();
 		descriptorPoolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
 
