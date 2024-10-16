@@ -79,7 +79,7 @@ class Renderer
 	GW::MATH::GVECTORF lightColour = { 0.9f, 0.9f, 1.0f, 1.0f };
 	GW::MATH::GVECTORF lightDir = { 1.0f, -1.0f, -2.0f };
 
-	VkImage images;
+	VkImage image;
 	VkImageView imageView;
 	VkBuffer textureHandle;
 	VkDeviceMemory textureData;
@@ -208,7 +208,7 @@ public:
 			temp.bufferView = model.images[i].bufferView;
 			temp.image = model.images[i].image;
 			temp.image.resize(temp.width * temp.height * temp.component);
-			UploadTextureToGPU(vlk, temp, textureHandle, textureData, images, imageView);
+			UploadTextureToGPU(vlk, temp, textureHandle, textureData, image, imageView);
 		}
 	}
 
@@ -523,7 +523,7 @@ private:
 		VkDescriptorBufferInfo textureDescriptorBuffer = {};
 		textureDescriptorBuffer.buffer = textureHandle;
 		textureDescriptorBuffer.offset = 0;
-		textureDescriptorBuffer.range = sizeof(images);
+		textureDescriptorBuffer.range = sizeof(image);
 
 		VkDescriptorImageInfo imageInfo = {};
 		imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
@@ -1214,7 +1214,7 @@ private:
 
 		vkDestroyBuffer(device, textureHandle, nullptr);
 		vkFreeMemory(device, textureData, nullptr);
-		vkDestroyImage(device, images, nullptr); 
+		vkDestroyImage(device, image, nullptr); 
 		vkDestroyImageView(device, imageView, nullptr);
 		vkDestroyDescriptorSetLayout(device, textureDescriptorSetLayout, nullptr);
 		vkDestroySampler(device, textureSampler, nullptr);
