@@ -249,7 +249,7 @@ public:
 
 
 		VkDescriptorSetLayoutBinding textureBinding = {};
-		textureBinding.binding = 0;
+		textureBinding.binding = 2;
 		textureBinding.descriptorCount = 1;
 		textureBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
 		textureBinding.pImmutableSamplers = nullptr;
@@ -495,27 +495,7 @@ private:
 
 			vkUpdateDescriptorSets(device, 2, writeDescriptors.data(), 0, nullptr);
 		}
-
-		VkSamplerCreateInfo samplerInfo = {};
-		samplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
-		samplerInfo.flags = 0;
-		samplerInfo.addressModeU = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_BORDER;
-		samplerInfo.addressModeV = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_BORDER;
-		samplerInfo.addressModeW = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_BORDER;
-		samplerInfo.magFilter = VK_FILTER_LINEAR;
-		samplerInfo.minFilter = VK_FILTER_LINEAR;
-		samplerInfo.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
-		samplerInfo.mipLodBias = 0;
-		samplerInfo.minLod = 0;
-		samplerInfo.maxLod = FLT_MAX;
-		samplerInfo.anisotropyEnable = VK_FALSE;
-		samplerInfo.maxAnisotropy = 1.0;
-		samplerInfo.borderColor = VK_BORDER_COLOR_FLOAT_OPAQUE_WHITE;
-		samplerInfo.compareEnable = VK_FALSE;
-		samplerInfo.compareOp = VK_COMPARE_OP_LESS;
-		samplerInfo.unnormalizedCoordinates = VK_FALSE;
-		samplerInfo.pNext = nullptr;
-		VkResult result = vkCreateSampler(device, &samplerInfo, nullptr, &textureSampler);
+		CreateSampler(vlk, textureSampler);
 
 		VkDescriptorBufferInfo textureDescriptorBuffer = {};
 		textureDescriptorBuffer.buffer = textureHandle;
