@@ -1214,9 +1214,6 @@ private:
 		storageBufferData.clear();
 
 
-
-		vkDestroyBuffer(device, textureHandle, nullptr);
-		vkFreeMemory(device, textureData, nullptr);
 		vkDestroyImage(device, image, nullptr); 
 		vkDestroyImageView(device, imageView, nullptr);
 		vkDestroyDescriptorSetLayout(device, textureDescriptorSetLayout, nullptr);
