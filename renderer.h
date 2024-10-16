@@ -1167,5 +1167,7 @@ private:
 		textureData.clear();
 		images.clear();
 		imagesView.clear();
+
+		vkDestroyDescriptorSetLayout(device, textureDescriptorSetLayout, nullptr);
 	}
 };
