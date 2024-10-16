@@ -1186,8 +1186,6 @@ private:
 		// Release allocated buffers, shaders & pipeline
 		vkDestroyBuffer(device, geometryHandle, nullptr);
 		vkFreeMemory(device, geometryData, nullptr);
-		vkDestroyBuffer(device, textureHandle, nullptr);
-		vkFreeMemory(device, textureData, nullptr);
 		vkDestroyShaderModule(device, vertexShader, nullptr);
 		vkDestroyShaderModule(device, fragmentShader, nullptr);
 		vkDestroyPipelineLayout(device, pipelineLayout, nullptr);
@@ -1214,6 +1212,8 @@ private:
 		storageBufferData.clear();
 
 
+		vkDestroyBuffer(device, textureHandle, nullptr);
+		vkFreeMemory(device, textureData, nullptr);
 		vkDestroyImage(device, image, nullptr); 
 		vkDestroyImageView(device, imageView, nullptr);
 		vkDestroyDescriptorSetLayout(device, textureDescriptorSetLayout, nullptr);
