@@ -184,9 +184,25 @@ public:
 				printf("  Byte Length: %d\n", bufferView.byteLength);
 				printf("  Target: %d\n", bufferView.target);
 			}
+			for (size_t i = 0; i < model.images.size(); ++i) {
+				const tinygltf::Image& image = model.images[i];
 
-			for (int i = 0; i < model.images.size(); ++i) {
-				std::cout << "Image " << i << " mimeType: " << model.images[i].mimeType << std::endl;
+				std::cout << "Image " << i << ":" << std::endl;
+				std::cout << "  Name: " << image.name << std::endl;
+				std::cout << "  URI: " << image.uri << std::endl;
+				std::cout << "  MimeType: " << image.mimeType << std::endl;
+				std::cout << "  Width: " << image.width << std::endl;
+				std::cout << "  Height: " << image.height << std::endl;
+				std::cout << "  Component Count: " << image.component << std::endl;
+				std::cout << "  Bits per Channel: " << image.bits << std::endl;
+				std::cout << "  Image Data Size: " << image.image.size() << " bytes" << std::endl;
+
+				// Optionally, print the first few bytes of image data as a hex dump for debugging
+				std::cout << "  First 10 bytes of image data: ";
+				for (size_t j = 0; j < std::min<size_t>(10, image.image.size()); ++j) {
+					printf("%02X ", image.image[j]);
+				}
+				std::cout << std::endl << std::endl;
 			}
 		}
 	}
