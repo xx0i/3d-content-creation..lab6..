@@ -949,9 +949,9 @@ private:
 		// Descriptor pipeline layout
 		VkPipelineLayoutCreateInfo pipeline_layout_create_info = {};
 		pipeline_layout_create_info.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-		pipeline_layout_create_info.setLayoutCount = descriptorSetLayouts.size();
 		descriptorSetLayouts.push_back(descriptorSetLayout);
 		descriptorSetLayouts.push_back(textureDescriptorSetLayout);
+		pipeline_layout_create_info.setLayoutCount = descriptorSetLayouts.size();
 		pipeline_layout_create_info.pSetLayouts = descriptorSetLayouts.data();
 		pipeline_layout_create_info.pushConstantRangeCount = 0;
 		pipeline_layout_create_info.pPushConstantRanges = nullptr;
