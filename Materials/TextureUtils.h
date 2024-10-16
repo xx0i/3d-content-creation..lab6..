@@ -38,6 +38,8 @@ void UploadTextureToGPU(GW::GRAPHICS::GVulkanSurface _surface, const tinygltf::I
 		&staging_bufferIM, &staging_buffer_memoryIM);
 
 	//Copy the staging information over
+	std::cout << "Image Data Pointer: " << static_cast<const void*>(_img.image.data()) << std::endl;
+	std::cout << "Image Size: " << _img.image.size() << std::endl;
 	GvkHelper::write_to_buffer(vkDev, staging_buffer_memoryIM,
 		_img.image.data(), static_cast<unsigned int>(imageSize));
 	//Create the new Buffer
