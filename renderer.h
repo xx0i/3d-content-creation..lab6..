@@ -198,7 +198,7 @@ public:
 		for (int i = 0; i < size; i++)
 		{
 			tinygltf::Image temp;
-			temp.mimeType = model.images[i].mimeType;
+			temp.mimeType = getMimeTypeFromUri(model.images[i].uri);
 			temp.name = model.images[i].name;
 			temp.uri = model.images[i].uri;
 			temp.bits = model.images[i].bits;
@@ -209,6 +209,17 @@ public:
 			temp.bufferView = model.images[i].bufferView;
 			UploadTextureToGPU(vlk, temp, textureHandle[i], textureData[i], images[i], imagesView[i]);
 		}
+	}
+
+	std::string getMimeTypeFromUri(const std::string& uri) 
+	{
+		if (uri.find(".jpg") != std::string::npos || uri.find(".jpeg") != std::string::npos) {
+			return "image/jpeg";
+		}
+		if (uri.find(".png") != std::string::npos) {
+			return "image/png";
+		}
+		return "unknown";
 	}
 
 	void createDescriptorLayout() //part b1
