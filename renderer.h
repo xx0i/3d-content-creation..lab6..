@@ -460,7 +460,7 @@ private:
 
 		for (int i = 0; i < textureData.size(); i++)
 		{
-			vkAllocateDescriptorSets(device, &descriptorAllocateInfoTexture, &textureDescriptorSets[i]);
+			VkResult result = vkAllocateDescriptorSets(device, &descriptorAllocateInfoTexture, &textureDescriptorSets[i]);
 		}
 	}
 
