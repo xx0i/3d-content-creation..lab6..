@@ -511,7 +511,7 @@ private:
 		writeTextureDescriptor.descriptorCount = 1;
 		writeTextureDescriptor.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
 		writeTextureDescriptor.dstArrayElement = 0;
-		writeTextureDescriptor.dstBinding = 0;
+		writeTextureDescriptor.dstBinding = 2;
 		writeTextureDescriptor.dstSet = textureDescriptorSets;
 		writeTextureDescriptor.pBufferInfo = &textureDescriptorBuffer;
 		writeTextureDescriptor.pImageInfo = nullptr;
