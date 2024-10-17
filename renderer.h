@@ -460,10 +460,18 @@ private:
 			vkAllocateDescriptorSets(device, &descriptorAllocateInfo, &descriptorSets[i]);
 		}
 
+		const uint32_t arraySize = textures.size();
+
+		VkDescriptorSetVariableDescriptorCountAllocateInfoEXT textureAllocateExt = {};
+		textureAllocateExt.descriptorSetCount = 1;
+		textureAllocateExt.pDescriptorCounts = &arraySize;
+		textureAllocateExt.pNext = nullptr;
+		textureAllocateExt.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_VARIABLE_DESCRIPTOR_COUNT_ALLOCATE_INFO_EXT;
+		
 		VkDescriptorSetAllocateInfo descriptorAllocateInfoTexture = {};
 		descriptorAllocateInfoTexture.descriptorPool = descriptorPool;
 		descriptorAllocateInfoTexture.descriptorSetCount = 1;
-		descriptorAllocateInfoTexture.pNext = nullptr;
+		descriptorAllocateInfoTexture.pNext = &textureAllocateExt;
 		descriptorAllocateInfoTexture.pSetLayouts = &textureDescriptorSetLayout;
 		descriptorAllocateInfoTexture.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
 
