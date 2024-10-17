@@ -15,8 +15,8 @@ cbuffer other_data
     vector lightDir, camPos;
 };
 
-Texture2D texture0 : register(t0, space1);
-SamplerState sampler0 : register(s0, space1);
+Texture2D textures[] : register(t0, space1);
+SamplerState samplers[] : register(s0, space1);
 
 float4 main(OUTPUT2 input) : SV_TARGET
 {
@@ -27,7 +27,8 @@ float4 main(OUTPUT2 input) : SV_TARGET
     static float4 ambient = { 0.1f, 0.1f, 0.1f, 1.0f };
     static float ns = 140.0f;
     
-    float4 textureColour = texture0.Sample(sampler0, input.texCoord.xy);
+    float4 textureColour = textures[0].Sample(samplers[0], input.texCoord.xy);
+    float textureRoughness = textures[1].Sample(samplers[0], input.texCoord.xy).r;
     
     float3 norm = normalize(input.normW);
     float3 lightDirection = normalize(lightDir);
@@ -38,7 +39,7 @@ float4 main(OUTPUT2 input) : SV_TARGET
     float3 viewDir = normalize(camPos.xyz - input.posW);
     float3 halfVect = normalize(-lightDirection.xyz + viewDir);
     float intensity = pow(saturate(dot(norm, halfVect)), ns);
-    float3 reflected = lightColour.xyz * (float3) specular * intensity;
+    float3 reflected = lightColour.xyz * (float3) specular * (intensity * textureRoughness);
     finalColour += float4(reflected, 1.0f);
 
     return finalColour;
