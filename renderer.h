@@ -522,6 +522,8 @@ private:
 			vkUpdateDescriptorSets(device, 2, writeDescriptors.data(), 0, nullptr);
 		}
 		CreateSampler(vlk, textureSampler);
+		std::vector<VkDescriptorImageInfo> infos = {};
+
 		for (int i = 0; i < textures.size(); i++)
 		{
 			VkDescriptorBufferInfo textureDescriptorBuffer = {};
@@ -533,6 +535,7 @@ private:
 			imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 			imageInfo.imageView = textures[i].imageView;
 			imageInfo.sampler = textureSampler;
+			infos.push_back(imageInfo);
 
 			VkWriteDescriptorSet writeTextureDescriptor = {};
 			writeTextureDescriptor.descriptorCount = 1;
@@ -545,7 +548,7 @@ private:
 			writeTextureDescriptor.pNext = nullptr;
 			writeTextureDescriptor.pTexelBufferView = nullptr;
 			writeTextureDescriptor.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-			writeTextureDescriptor.pImageInfo = &imageInfo;
+			writeTextureDescriptor.pImageInfo = infos.data();
 			vkUpdateDescriptorSets(device, 1, &writeTextureDescriptor, 0, nullptr);
 		}
 	}
