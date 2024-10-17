@@ -543,7 +543,6 @@ private:
 			writeTextureDescriptor.dstBinding = 0;
 			writeTextureDescriptor.dstSet = textureDescriptorSets;
 			writeTextureDescriptor.pBufferInfo = &textureDescriptorBuffer;
-			writeTextureDescriptor.pImageInfo = nullptr;
 			writeTextureDescriptor.pNext = nullptr;
 			writeTextureDescriptor.pTexelBufferView = nullptr;
 			writeTextureDescriptor.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
