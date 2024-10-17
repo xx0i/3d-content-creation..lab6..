@@ -1,4 +1,4 @@
-#define TINYGLTF_IMPLEMENTATION //needed for linking tinygltf - a2
+#define TINYGLTF_IMPLEMENTATION //needed for linking tinygltf
 #define	STB_IMAGE_IMPLEMENTATION
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "../TinyGLTF/tiny_gltf.h"
@@ -38,9 +38,8 @@ class Renderer
 	VkPipelineLayout pipelineLayout = nullptr;
 	unsigned int windowWidth, windowHeight;
 
-	tinygltf::Model model; //instance of model from tinygltf - part a2/a3
-	tinygltf::TinyGLTF loader; //instance of the tinygltf class - part a2
-	//strings github said to add for loading from gltf
+	tinygltf::Model model; //instance of model from tinygltf
+	tinygltf::TinyGLTF loader; //instance of the tinygltf class
 	std::string err;
 	std::string warn;
 
@@ -79,6 +78,7 @@ class Renderer
 	GW::MATH::GVECTORF lightColour = { 0.9f, 0.9f, 1.0f, 1.0f };
 	GW::MATH::GVECTORF lightDir = { 1.0f, -1.0f, -2.0f };
 
+	//texturing
 	struct textureInfo
 	{
 		VkImage image;
@@ -231,7 +231,7 @@ public:
 		return "unknown";
 	}
 
-	void createDescriptorLayout() //part b1
+	void createDescriptorLayout()
 	{
 		VkDescriptorSetLayoutBinding uniformBinding = {};
 		uniformBinding.binding = 0;
@@ -311,7 +311,6 @@ private:
 		vlk.GetRenderPass((void**)&renderPass);
 	}
 
-	//part b1
 	void InitializeGeometryBuffer()
 	{
 		//vertex data
@@ -749,12 +748,12 @@ private:
 	{
 		VkVertexInputBindingDescription retval = {};
 		retval.binding = 0;
-		retval.stride = sizeof(float) * 3; //part b3
+		retval.stride = sizeof(float) * 3;
 		retval.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
 		return retval;
 	}
 
-	std::vector<VkVertexInputBindingDescription> CreateVkVertexInputBindingDescriptionArray() //part b4
+	std::vector<VkVertexInputBindingDescription> CreateVkVertexInputBindingDescriptionArray()
 	{
 		const tinygltf::Primitive& primitive = model.meshes[0].primitives[0];
 		const tinygltf::Accessor& posAccessor = model.accessors[primitive.attributes.at("POSITION")];
@@ -979,7 +978,7 @@ public:
 		vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &descriptorSets[activeImage], 0, 0);
 		vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 1, 1, &textureDescriptorSets, 0, 0);
 
-		const tinygltf::Accessor& indexAccessor = model.accessors[model.meshes[0].primitives[0].indices]; //part b2
+		const tinygltf::Accessor& indexAccessor = model.accessors[model.meshes[0].primitives[0].indices];
 		uint32_t indexCount = indexAccessor.count;
 		vkCmdDrawIndexed(commandBuffer, indexCount, 1, 0, 0, 0);
 	}
@@ -1089,7 +1088,7 @@ private:
 		vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
 	}
 
-	void BindVertexBuffers(VkCommandBuffer& commandBuffer) //updated in part b2
+	void BindVertexBuffers(VkCommandBuffer& commandBuffer)
 	{
 		const tinygltf::Primitive& primitive = model.meshes[0].primitives[0]; //position data
 		const tinygltf::Accessor& accessPos = model.accessors[primitive.attributes.at("POSITION")];
@@ -1136,7 +1135,7 @@ private:
 		vkCmdBindVertexBuffers(commandBuffer, 3, 1, &geometryHandle, offsets3);
 	}
 
-	void BindIndexBuffers(VkCommandBuffer& commandBuffer) //part b2
+	void BindIndexBuffers(VkCommandBuffer& commandBuffer)
 	{
 		const tinygltf::Primitive& primitive = model.meshes[0].primitives[0];
 		const tinygltf::Accessor& accessIndicies = model.accessors[primitive.indices];
@@ -1174,11 +1173,11 @@ private:
 		VkIndexType indexType;
 		switch (accessIndicies.componentType)
 		{
-		case TINYGLTF_COMPONENT_TYPE_UNSIGNED_SHORT: // 5123
+		case TINYGLTF_COMPONENT_TYPE_UNSIGNED_SHORT: //5123
 			indexType = VK_INDEX_TYPE_UINT16;
 			break;
 
-		case TINYGLTF_COMPONENT_TYPE_UNSIGNED_INT: // 5125
+		case TINYGLTF_COMPONENT_TYPE_UNSIGNED_INT: //5125
 			indexType = VK_INDEX_TYPE_UINT32;
 			break;
 
