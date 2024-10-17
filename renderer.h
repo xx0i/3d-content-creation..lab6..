@@ -523,33 +523,35 @@ private:
 		}
 		CreateSampler(vlk, textureSampler);
 		std::vector<VkDescriptorImageInfo> infos = {};
-
+		std::vector<VkDescriptorBufferInfo> ff = {};
 		for (int i = 0; i < textures.size(); i++)
 		{
 			VkDescriptorBufferInfo textureDescriptorBuffer = {};
 			textureDescriptorBuffer.buffer = textures[i].textureHandle;
 			textureDescriptorBuffer.offset = 0;
 			textureDescriptorBuffer.range = sizeof(textures);
+			ff.push_back(textureDescriptorBuffer);
 
 			VkDescriptorImageInfo imageInfo = {};
 			imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 			imageInfo.imageView = textures[i].imageView;
 			imageInfo.sampler = textureSampler;
 			infos.push_back(imageInfo);
+		}
 
 			VkWriteDescriptorSet writeTextureDescriptor = {};
-			writeTextureDescriptor.descriptorCount = textures.size();
+			writeTextureDescriptor.descriptorCount = 1;
 			writeTextureDescriptor.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
 			writeTextureDescriptor.dstArrayElement = 0;
 			writeTextureDescriptor.dstBinding = 0;
 			writeTextureDescriptor.dstSet = textureDescriptorSets;
-			writeTextureDescriptor.pBufferInfo = &textureDescriptorBuffer;
+			writeTextureDescriptor.pBufferInfo = ff.data();
 			writeTextureDescriptor.pNext = nullptr;
 			writeTextureDescriptor.pTexelBufferView = nullptr;
 			writeTextureDescriptor.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
 			writeTextureDescriptor.pImageInfo = infos.data();
-			vkUpdateDescriptorSets(device, textures.size(), &writeTextureDescriptor, 0, nullptr);
-		}
+			vkUpdateDescriptorSets(device, 1, &writeTextureDescriptor, 0, nullptr);
+		
 	}
 
 	void CompileShaders()
