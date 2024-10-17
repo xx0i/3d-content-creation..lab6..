@@ -535,6 +535,7 @@ private:
 			imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 			imageInfo.imageView = textures[i].imageView;
 			imageInfo.sampler = textureSampler;
+			infos.push_back(imageInfo);
 
 			VkWriteDescriptorSet writeTextureDescriptor = {};
 			writeTextureDescriptor.descriptorCount = textures.size();
@@ -546,7 +547,7 @@ private:
 			writeTextureDescriptor.pNext = nullptr;
 			writeTextureDescriptor.pTexelBufferView = nullptr;
 			writeTextureDescriptor.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-			writeTextureDescriptor.pImageInfo = &imageInfo;
+			writeTextureDescriptor.pImageInfo = infos.data();
 			vkUpdateDescriptorSets(device, textures.size(), &writeTextureDescriptor, 0, nullptr);
 		}
 	}
