@@ -522,7 +522,7 @@ private:
 			vkUpdateDescriptorSets(device, 2, writeDescriptors.data(), 0, nullptr);
 		}
 		CreateSampler(vlk, textureSampler);
-		for (int i = 0; i < uniformBufferData.size(); i++)
+		for (int i = 0; i < textures.size(); i++)
 		{
 			VkDescriptorBufferInfo textureDescriptorBuffer = {};
 			textureDescriptorBuffer.buffer = textures[i].textureHandle;
