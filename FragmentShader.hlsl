@@ -20,14 +20,14 @@ SamplerState samplers[] : register(s0, space1);
 
 float4 main(OUTPUT2 input) : SV_TARGET
 {
-    //temp hard coded data - till the texture data is used in lab 6
+    //temp hard coded data
     //static float4 diffuse = { 1.0f, 1.0f, 1.0f, 0.0f };
     static float4 specular = { 1.0f, 1.0f, 1.0f, 1.0f };
     static float4 emissive = { 0.0f, 0.0f, 0.0f, 1.0f };
     static float4 ambient = { 0.1f, 0.1f, 0.1f, 1.0f };
     static float ns = 140.0f;
     
-    float4 textureColour = textures[0].Sample(samplers[0], input.texCoord.xy);
+    float4 textureColour = textures[2].Sample(samplers[0], input.texCoord.xy);
     float textureRoughness = textures[1].Sample(samplers[0], input.texCoord.xy).r;
     
     float3 norm = normalize(input.normW);
