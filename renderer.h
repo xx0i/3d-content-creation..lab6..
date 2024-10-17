@@ -283,10 +283,6 @@ public:
 		vkCreateDescriptorSetLayout(device, &textureLayoutInfo, nullptr, &textureDescriptorSetLayout);
 	}
 
-
-//Finally, you will want to modify the “.descriptorCount” of the texture descriptor’s layout binding to reflect the maximum number of 
-//textures now accessible within our new array. (Avoid hard - coding this)
-
 private:
 	void UpdateWindowDimensions()
 	{
