@@ -79,10 +79,15 @@ class Renderer
 	GW::MATH::GVECTORF lightColour = { 0.9f, 0.9f, 1.0f, 1.0f };
 	GW::MATH::GVECTORF lightDir = { 1.0f, -1.0f, -2.0f };
 
-	VkImage image;
-	VkImageView imageView;
-	VkBuffer textureHandle;
-	VkDeviceMemory textureData;
+	struct textureInfo
+	{
+		VkImage image;
+		VkImageView imageView;
+		VkBuffer textureHandle;
+		VkDeviceMemory textureData;
+	};
+	std::vector<textureInfo> textures;
+
 	VkDescriptorSetLayout textureDescriptorSetLayout = nullptr;
 	VkDescriptorSet textureDescriptorSets;
 	VkSampler textureSampler{};
@@ -193,20 +198,25 @@ public:
 	void loadImageFromGltf()
 	{
 		unsigned int size = model.images.size();
+		textures.resize(size);
 
+		for (int i = 0; i < size; i++)
+		{
 			tinygltf::Image temp;
-			temp.mimeType = getMimeTypeFromUri(model.images[0].uri);
-			temp.name = model.images[0].name;
-			temp.uri = model.images[0].uri;
-			temp.bits = model.images[0].bits;
-			temp.height = model.images[0].height;
-			temp.width = model.images[0].width;
-			temp.component = model.images[0].component;
-			temp.pixel_type = model.images[0].pixel_type;
-			temp.bufferView = model.images[0].bufferView;
-			temp.image = model.images[0].image;
+			temp.mimeType = getMimeTypeFromUri(model.images[i].uri);
+			temp.name = model.images[i].name;
+			temp.uri = model.images[i].uri;
+			temp.bits = model.images[i].bits;
+			temp.height = model.images[i].height;
+			temp.width = model.images[i].width;
+			temp.component = model.images[i].component;
+			temp.pixel_type = model.images[i].pixel_type;
+			temp.bufferView = model.images[i].bufferView;
+			temp.image = model.images[i].image;
 			temp.image.resize(temp.width * temp.height * temp.component);
-			UploadTextureToGPU(vlk, temp, textureHandle, textureData, image, imageView);
+			UploadTextureToGPU(vlk, temp, textures[i].textureHandle, textures[i].textureData, textures[i].image, textures[i].imageView);
+		}
+
 	}
 
 	std::string getMimeTypeFromUri(const std::string& uri)
@@ -496,30 +506,32 @@ private:
 			vkUpdateDescriptorSets(device, 2, writeDescriptors.data(), 0, nullptr);
 		}
 		CreateSampler(vlk, textureSampler);
+		for (int i = 0; i < uniformBufferData.size(); i++)
+		{
+			VkDescriptorBufferInfo textureDescriptorBuffer = {};
+			textureDescriptorBuffer.buffer = textures[i].textureHandle;
+			textureDescriptorBuffer.offset = 0;
+			textureDescriptorBuffer.range = sizeof(textures);
 
-		VkDescriptorBufferInfo textureDescriptorBuffer = {};
-		textureDescriptorBuffer.buffer = textureHandle;
-		textureDescriptorBuffer.offset = 0;
-		textureDescriptorBuffer.range = sizeof(image);
+			VkDescriptorImageInfo imageInfo = {};
+			imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+			imageInfo.imageView = textures[i].imageView;
+			imageInfo.sampler = textureSampler;
 
-		VkDescriptorImageInfo imageInfo = {};
-		imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-		imageInfo.imageView = imageView;
-		imageInfo.sampler = textureSampler;
-
-		VkWriteDescriptorSet writeTextureDescriptor = {};
-		writeTextureDescriptor.descriptorCount = 1;
-		writeTextureDescriptor.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-		writeTextureDescriptor.dstArrayElement = 0;
-		writeTextureDescriptor.dstBinding = 0;
-		writeTextureDescriptor.dstSet = textureDescriptorSets;
-		writeTextureDescriptor.pBufferInfo = &textureDescriptorBuffer;
-		writeTextureDescriptor.pImageInfo = nullptr;
-		writeTextureDescriptor.pNext = nullptr;
-		writeTextureDescriptor.pTexelBufferView = nullptr;
-		writeTextureDescriptor.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-		writeTextureDescriptor.pImageInfo = &imageInfo;
-		vkUpdateDescriptorSets(device, 1, &writeTextureDescriptor, 0, nullptr);
+			VkWriteDescriptorSet writeTextureDescriptor = {};
+			writeTextureDescriptor.descriptorCount = 1;
+			writeTextureDescriptor.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+			writeTextureDescriptor.dstArrayElement = 0;
+			writeTextureDescriptor.dstBinding = 0;
+			writeTextureDescriptor.dstSet = textureDescriptorSets;
+			writeTextureDescriptor.pBufferInfo = &textureDescriptorBuffer;
+			writeTextureDescriptor.pImageInfo = nullptr;
+			writeTextureDescriptor.pNext = nullptr;
+			writeTextureDescriptor.pTexelBufferView = nullptr;
+			writeTextureDescriptor.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+			writeTextureDescriptor.pImageInfo = &imageInfo;
+			vkUpdateDescriptorSets(device, 1, &writeTextureDescriptor, 0, nullptr);
+		}
 	}
 
 	void CompileShaders()
@@ -1188,11 +1200,15 @@ private:
 		storageBufferHandle.clear();
 		storageBufferData.clear();
 
+		for (int i = 0; i < textures.size(); i++)
+		{
+			vkDestroyBuffer(device, textures[i].textureHandle, nullptr);
+			vkFreeMemory(device, textures[i].textureData, nullptr);
+			vkDestroyImage(device, textures[i].image, nullptr);
+			vkDestroyImageView(device, textures[i].imageView, nullptr);
+		}
+		textures.clear();
 
-		vkDestroyBuffer(device, textureHandle, nullptr);
-		vkFreeMemory(device, textureData, nullptr);
-		vkDestroyImage(device, image, nullptr); 
-		vkDestroyImageView(device, imageView, nullptr);
 		vkDestroyDescriptorSetLayout(device, textureDescriptorSetLayout, nullptr);
 		vkDestroySampler(device, textureSampler, nullptr);
 	}
