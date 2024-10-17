@@ -547,7 +547,7 @@ private:
 			writeTextureDescriptor.pTexelBufferView = nullptr;
 			writeTextureDescriptor.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
 			writeTextureDescriptor.pImageInfo = &imageInfo;
-			vkUpdateDescriptorSets(device, 1, &writeTextureDescriptor, 0, nullptr);
+			vkUpdateDescriptorSets(device, textures.size(), &writeTextureDescriptor, 0, nullptr);
 		}
 	}
 
