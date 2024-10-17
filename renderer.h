@@ -260,20 +260,32 @@ public:
 
 		VkDescriptorSetLayoutBinding textureBinding = {};
 		textureBinding.binding = 0;
-		textureBinding.descriptorCount = 1;
+		textureBinding.descriptorCount = textures.size();
 		textureBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
 		textureBinding.pImmutableSamplers = nullptr;
 		textureBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+
+		VkDescriptorBindingFlagsEXT textureBindingFlag = VK_DESCRIPTOR_BINDING_PARTIALLY_BOUND_BIT_EXT;
+
+		VkDescriptorSetLayoutBindingFlagsCreateInfoEXT textureFlag = {};
+		textureFlag.bindingCount = 1;
+		textureFlag.pBindingFlags = &textureBindingFlag;
+		textureFlag.pNext = nullptr;
+		textureFlag.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_BINDING_FLAGS_CREATE_INFO_EXT;
 
 		VkDescriptorSetLayoutCreateInfo textureLayoutInfo = {};
 		textureLayoutInfo.bindingCount = 1;
 		textureLayoutInfo.flags = 0;
 		textureLayoutInfo.pBindings = &textureBinding;
-		textureLayoutInfo.pNext = nullptr;
+		textureLayoutInfo.pNext = &textureFlag;
 		textureLayoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
 
 		vkCreateDescriptorSetLayout(device, &textureLayoutInfo, nullptr, &textureDescriptorSetLayout);
 	}
+
+
+//Finally, you will want to modify the “.descriptorCount” of the texture descriptor’s layout binding to reflect the maximum number of 
+//textures now accessible within our new array. (Avoid hard - coding this)
 
 private:
 	void UpdateWindowDimensions()
